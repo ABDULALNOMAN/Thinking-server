@@ -18,6 +18,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 const run = async() => {
     try {
         const publicCollection = client.db('Thinkingdata').collection('dataSet')
+        const aboutMe = client.db('Thinkingdata').collection('About')
         app.post('/adding', async (req, res) => {
             const query = req.body;
             const result = await publicCollection.insertOne(query)
@@ -37,6 +38,38 @@ const run = async() => {
             const id = req.params.id
             const query = {_id:ObjectId(id)}
             const result = await publicCollection.findOne(query)
+            res.send(result)
+        })
+        app.get('/about', async(req, res) => {
+            const query = {};
+            const result = await aboutMe.findOne(query)
+            res.send(result)
+        })
+        app.put('/update',async(req,res)=>{
+            const query = req.query.id
+            const data = req.body
+            const id = {_id: ObjectId(query)}
+            console.log(data)
+            const updateDoc = {
+                $set: {
+                    commentBox:[
+                        data
+                    ]
+                }
+            }
+            const result = await publicCollection.updateOne(id, updateDoc) 
+            res.send(result)
+        })
+        app.patch('/modal',async(req,res)=>{
+            const id = req.query.id
+            const query = {_id: ObjectId(id)}
+            const data = req.body
+            const option = { upsert: true }
+            console.log(data)
+            const updateDoc = {
+                $set:data
+            }
+            const result = await aboutMe.updateOne(query,updateDoc,option)
             res.send(result)
         })
     }
