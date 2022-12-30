@@ -70,17 +70,19 @@ const run = async() => {
             const result = await aboutMe.updateOne(query, updateDoc, option)
             res.send(result)
         })
-        // app.post('/comments', async(req, res) => {
-        //     const query = req.body
-        //     const result = await commentBox.insertOne(query)
-        //     res.send(result)
-        //     console.log(result)
-        // })
-        // app.get('/dataComment',async(req,res)=>{
-        //     const query = {};
-        //     const result = await commentBox.find(query).toArray()
-        //     // res.send(result)
-        // })
+        app.put('/likecount', async(req, res) => {
+            const id = req.query.id
+            const query = { _id: ObjectId(id) }
+            const body = req.headers
+            const option = {upsert:true}
+            const updateDoc= {
+                $set: {
+                    like:body.like
+                }
+            }
+            const result = await publicCollection.updateOne(query,updateDoc,option)
+            res.send(result)
+        })
     }
     finally {
         
