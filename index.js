@@ -73,7 +73,7 @@ const run = async() => {
         app.put('/likecount', async(req, res) => {
             const id = req.query.id
             const query = { _id: ObjectId(id) }
-            const body = req.headers
+            const body = req.body
             const option = {upsert:true}
             const updateDoc= {
                 $set: {
