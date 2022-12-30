@@ -4,21 +4,21 @@ const app = express()
 const { MongoClient, ServerApiVersion, ObjectId, ObjectID } = require('mongodb');
 const { query } = require('express');
 const port = process.env.PORT || 5000
+require('dotenv').config()
 
 // middleware
 app.use(cors())
 app.use(express.json())
 
-// user: userthinking
-// pass: FbjKNr4LfLLqYGn6
 
 
-const uri =`mongodb+srv://userthinking:FbjKNr4LfLLqYGn6@cluster0.jhoqsnq.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.USER_ID}:${process.env.PASS_KEY}@cluster0.jhoqsnq.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 const run = async() => {
     try {
         const publicCollection = client.db('Thinkingdata').collection('dataSet')
         const aboutMe = client.db('Thinkingdata').collection('About')
+        const commentBox = client.db('Thinkingdata').collection('comments')
         app.post('/adding', async (req, res) => {
             const query = req.body;
             const result = await publicCollection.insertOne(query)
@@ -49,15 +49,13 @@ const run = async() => {
             const query = req.query.id
             const data = req.body
             const id = {_id: ObjectId(query)}
-            console.log(data)
+            const option = { upsert:true}
             const updateDoc = {
-                $set: {
-                    commentBox:[
-                        data
-                    ]
+                $push: {
+                    commentBox:data
                 }
             }
-            const result = await publicCollection.updateOne(id, updateDoc) 
+            const result = await publicCollection.updateOne(id, updateDoc,option) 
             res.send(result)
         })
         app.patch('/modal',async(req,res)=>{
@@ -69,9 +67,20 @@ const run = async() => {
             const updateDoc = {
                 $set:data
             }
-            const result = await aboutMe.updateOne(query,updateDoc,option)
+            const result = await aboutMe.updateOne(query, updateDoc, option)
             res.send(result)
         })
+        // app.post('/comments', async(req, res) => {
+        //     const query = req.body
+        //     const result = await commentBox.insertOne(query)
+        //     res.send(result)
+        //     console.log(result)
+        // })
+        // app.get('/dataComment',async(req,res)=>{
+        //     const query = {};
+        //     const result = await commentBox.find(query).toArray()
+        //     // res.send(result)
+        // })
     }
     finally {
         
